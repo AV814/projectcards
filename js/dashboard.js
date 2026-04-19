@@ -44,7 +44,7 @@ onAuthStateChanged(auth, async (user) => {
       <span class="points">$${userData.points}</span>
     `;
 
-    profilePic.src = userData.profilePicture || "images/default-pfp.png";
+    profilePic.src = userData.profilePicture || "";
 
     // Live-update cards if prices change
     const cardsRef = dbRef(database, "cards");

@@ -33,7 +33,7 @@ onValue(usersRef, async (snapshot) => {
       points: data.points || 0,
       cardValue,
       netWorth,
-      pfp: data.profilePicture || "images/default-pfp.png",
+      pfp: data.profilePicture || "",
     };
   });
 
@@ -45,7 +45,7 @@ onValue(usersRef, async (snapshot) => {
       (u, i) => `
         <div class="profile-card">
           <span class="rank">#${i + 1}</span>
-          <img src="${u.pfp}" alt="${u.name}'s picture" class="profile-pic-square">
+          <img src="${u.pfp}" alt="${u.name}'s picture" class="profile-pic-square" onerror="this.style.display='none'">
           <div class="profile-info">
             <a href="profile.html?id=${u.uid}" class="profile-name">${u.name}</a>
             <p class="profile-points">Net worth: $${u.netWorth}</p>
