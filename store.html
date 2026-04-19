@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Store | Project Cards</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Buttons */
+    .button,
+    #logout,
+    #change-pfp {
+      background-color: #40557A;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.2s;
+    }
+
+    .button:hover,
+    #logout:hover,
+    #change-pfp:hover {
+      background-color: #476DC9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Project Cards - Shop</h1>
+  <h4>(Updates every hour, inventory auto-sells at the end of every Friday</h4>
+  <h4>and the market resets back to original prices)</h4>
+  <p id="user-info"></p>
+
+  <a href="dashboard.html" class="button" style="text-decoration:none">Dashboard</a>
+  
+  <div id="card-container"></div>
+
+  <!-- Make sure this points to the correct JS path -->
+  <script type="module" src="js/store.js"></script>
+</body>
+</html>

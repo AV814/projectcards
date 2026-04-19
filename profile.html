@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Profile | Project Cards</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      text-align: center;
+      background-color: #1a1a1a;
+      color: #C2C2C2;
+      font-family: Courier;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Profile header same as dashboard */
+    #profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .profile-pic {
+      width: 125px;
+      height: 125px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #ccc;
+      margin-bottom: 10px;
+    }
+
+    #player-name {
+      font-size: 2em;
+      font-weight: 600;
+      color: #C2C2C2;
+      margin-bottom: 2px;
+    }
+
+    #player-points {
+      font-size: 2em;
+      color: #C2C2C2;
+      margin-bottom: 5px;
+    }
+
+    /* Card container */
+    #card-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px;
+    }
+
+    .card-item {
+      background-color: #2c2f36;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      width: 180px;
+      height: 230px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .card-item img {
+      width: 150px;
+      height: 200px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    h2 {
+      color: #C2C2C2;
+      margin-top: 30px;
+    }
+
+    a {
+      color: #00cec9;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+      margin: 20px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Buttons */
+    .button,
+    #logout,
+    #change-pfp {
+      background-color: #40557A;
+      color: white;
+      border: none;
+      border-radius: 2px;
+      padding: 5px 5px;
+      cursor: pointer;
+      font-size: 1em;
+      font: Courier;
+      transition: background 0.2s;
+    }
+
+    .button:hover,
+    #logout:hover,
+    #change-pfp:hover {
+      background-color: #476DC9;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Profile Header -->
+  <div id="profile-header">
+    <img id="player-pfp" src="images/default-pfp.png" alt="Profile Picture" class="profile-pic" />
+    <p id="player-name">Loading...</p>
+    <p id="player-points"></p>
+  </div>
+
+  <!-- Card Collection -->
+  <h2>[ Inventory ]</h2>
+  <div id="card-list"></div>
+
+  <a href="profiles.html" class="button" style="text-decoration:none">←Back</a>
+
+  <script type="module" src="js/profile.js"></script>
+</body>
+</html>

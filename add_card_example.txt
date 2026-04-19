@@ -1,0 +1,15 @@
+PRESS PLUS NEXT TO CARDS IN FIREBASE
+
+NAME CARD IN KEY FIELD
+
+REPLACE NEEDED AND PUT THIS IN "VALUE":
+{
+  "name": "Barrel",
+  "price": 30,
+  "original_price": 30,
+  "stock": 50,
+  "original_stock": "50",
+  "image": "images/barrel.png",
+  "lastChange": "up",
+  "tier": "1"
+}

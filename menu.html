@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Main Menu | Project Cards</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #1a1a1a, #2d3436);
+      margin: 0;
+    }
+    h1 { font-size: 2.5em; margin-bottom: 10px; color: #00cec9; }
+    p { color: #ccc; margin-bottom: 20px; }
+    .menu-container { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+    .menu-button {
+      background: #40557A;
+      color: #fff;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 2px;
+      font-size: 1.2em;
+      cursor: pointer;
+      width: 220px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-weight: bold;
+      font-family: Courier, monospace;
+      text-align: center;
+      display: inline-block;
+    }
+    .menu-button:hover { background: #476DC9; transform: scale(1.05); }
+    img.game-logo { width: auto; height: 200px; object-fit: cover; margin-bottom: 15px; }
+    footer { position: absolute; bottom: 15px; font-size: 0.9em; color: #888; }
+  </style>
+</head>
+<body>
+  <img src="https://firebasestorage.googleapis.com/v0/b/projectcards-b6b53.firebasestorage.app/o/gamesprites%2Ficon.png?alt=media&token=ebc2eae1-0069-4fd7-9eee-8eca3ce85bb4" alt="Game Logo" class="game-logo" />
+  <p>Ermmm buy and sell cards and stuff. Yayayay</p>
+  <div class="menu-container">
+    <a href="dashboard.html" class="menu-button">Dashboard</a>
+    <a href="store.html" class="menu-button">Shop</a>
+    <a href="profiles.html" class="menu-button">Leaderboard</a>
+  </div>
+  <footer>© 2025 Project Cards | ADV04</footer>
+
+  <script type="module">
+    // Redirect to login if not authenticated
+    import { auth } from "./js/firebase.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    onAuthStateChanged(auth, (user) => {
+      if (!user) window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

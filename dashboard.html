@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | ProjectCards</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    #profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .profile-pic {
+      width: 125px;
+      height: 125px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #ccc;
+      margin-bottom: 5px;
+    }
+
+    #user-info {
+      font-size: 2em;
+      font-weight: 600;
+      color: #C2C2C2;
+    }
+
+    .points { color: #00b894; }
+
+    #card-container {
+      margin: 20px;
+      text-align: center;
+    }
+
+    #total-card-value {
+      color: #74b9ff;
+      font-size: 1em;
+      margin: 5px 0 20px;
+    }
+
+    .card-value {
+      color: #74b9ff;
+      font-size: 0.85em;
+    }
+
+    .button,
+    #logout,
+    #change-pfp {
+      background-color: #40557A;
+      color: white;
+      border: none;
+      border-radius: 2px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 1em;
+      font-family: Courier;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+
+    .button:hover,
+    #logout:hover,
+    #change-pfp:hover {
+      background-color: #476DC9;
+    }
+
+    #footer-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+      gap: 10px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="profile-header">
+    <img id="profile-pic" src="images/default-pfp.png" alt="PFP" class="profile-pic" />
+    <p id="user-info"></p>
+    <p id="total-card-value"></p>
+  </div>
+
+  <input type="file" id="upload-pfp" accept="image/*" style="display:none;" />
+
+  <a href="menu.html" class="button" style="text-decoration:none">Menu</a>
+  <a href="store.html" class="button" style="text-decoration:none">Shop</a>
+  <a href="profiles.html" class="button" style="text-decoration:none">Leaderboard</a>
+
+  <h1>[ Inventory ]</h1>
+  <div id="card-container"></div>
+
+  <div id="footer-section">
+    <button id="change-pfp">PFP Upload</button>
+    <button id="logout">Logout</button>
+  </div>
+
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
