@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trades | Project Cards</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <h1>🔄 Card Trades</h1>
+  <p id="user-info"></p>
+  <a href="menu.html" class="button">Menu</a>
+  <a href="lootbox.html" class="button">Loot Boxes</a>
+  <a href="dashboard.html" class="button">Dashboard</a>
+
+  <div class="trades-page">
+
+    <section class="trades-section">
+      <h2>[ My Cards ]</h2>
+      <div id="my-cards"></div>
+    </section>
+
+    <section class="trades-section">
+      <h2>[ Offer a Trade ]</h2>
+      <form id="new-trade-form" class="trade-form">
+        <label>I'll give:</label>
+        <select id="offer-card"></select>
+        <label>In exchange for:</label>
+        <select id="want-card"></select>
+        <label>From player:</label>
+        <select id="target-player"></select>
+        <button type="submit">Send Trade Offer</button>
+      </form>
+    </section>
+
+    <section class="trades-section">
+      <h2>[ Incoming Offers ]</h2>
+      <div id="incoming-trades"></div>
+    </section>
+
+    <section class="trades-section">
+      <h2>[ My Outgoing Offers ]</h2>
+      <div id="outgoing-trades"></div>
+    </section>
+
+  </div>
+
+  <script type="module" src="js/trades.js"></script>
+</body>
+</html>

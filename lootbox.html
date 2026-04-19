@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loot Boxes | Project Cards</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <h1>📦 Loot Boxes</h1>
+  <p id="user-info"></p>
+  <p style="color:#aaa;font-size:0.9em">Open boxes to get random trading cards. All cards auto-sell at end of week.</p>
+  <a href="menu.html" class="button">Menu</a>
+  <a href="dashboard.html" class="button">Dashboard</a>
+  <a href="trades.html" class="button">Trades</a>
+
+  <div id="lootbox-container"></div>
+
+  <!-- Result Modal -->
+  <div id="result-modal" style="display:none">
+    <div id="result-inner">
+      <h2 id="result-title"></h2>
+      <div id="result-cards"></div>
+      <button id="close-modal">Close</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/lootbox.js"></script>
+</body>
+</html>

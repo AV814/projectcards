@@ -3,46 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin — ProjectCards</title>
+  <title>Admin — Project Cards</title>
   <link rel="stylesheet" href="css/style.css" />
   <style>
-    body { max-width: 900px; margin: 0 auto; padding: 20px; text-align: left; }
-    h1 { text-align: center; color: #fdcb6e; }
-    .admin-controls {
-      background: #2c2f36;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-    .admin-controls p { margin: 8px 0; }
-    #countdown { font-size: 1.8em; color: #fdcb6e; font-weight: bold; }
-    #status-msg { font-size: 0.95em; min-height: 1.4em; margin-top: 10px; }
-    #force-update { background: #2d6a4f; margin: 5px; }
-    #force-update:hover { background: #40916c; }
-    #force-sell { background: #7d3c3c; margin: 5px; }
-    #force-sell:hover { background: #b05454; }
-    #card-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-    }
-    .card-item { width: 160px; font-size: 0.9em; }
+    body { max-width:1000px; margin:0 auto; padding:20px; text-align:left; }
+    h1 { text-align:center; color:#fdcb6e; }
+    h2 { color:#aaa; border-bottom:1px solid #444; padding-bottom:5px; }
+    .admin-controls { background:#2c2f36; padding:20px; border-radius:8px; margin-bottom:30px; text-align:center; }
+    #countdown { font-size:1.8em; color:#fdcb6e; font-weight:bold; }
+    #status-msg { font-size:0.95em; min-height:1.4em; margin-top:10px; }
+    #force-stocks { background:#2d6a4f; margin:5px; }
+    #force-stocks:hover { background:#40916c; }
+    #weekly-reset { background:#7d3c3c; margin:5px; }
+    #weekly-reset:hover { background:#b05454; }
+    .grid { display:flex; flex-wrap:wrap; gap:12px; margin-top:15px; }
+    .card-item { width:160px; font-size:0.85em; }
   </style>
 </head>
 <body>
   <h1>— Admin Panel —</h1>
   <div class="admin-controls">
-    <p>Price engine — keep this tab open on your server to run auto-updates.</p>
-    <p>Version v0.07</p>
-    <p>Next update in: <span id="countdown">--</span> seconds</p>
-    <button id="force-update">Force Price Update</button>
-    <button id="force-sell">Force Sell &amp; Reset Market</button>
+    <p>Keep this tab open on your server to run auto price updates.</p>
+    <p>Version v0.08</p>
+    <p>Next stock update in: <span id="countdown">--</span> seconds</p>
+    <button id="force-stocks">Force Stock Price Update</button>
+    <button id="weekly-reset">⚠️ Weekly Reset (Auto-sell all cards)</button>
     <p id="status-msg"></p>
   </div>
 
-  <div id="card-list"></div>
+  <h2>Stocks</h2>
+  <div id="stock-list" class="grid"></div>
+
+  <h2>Trading Cards</h2>
+  <div id="card-list" class="grid"></div>
 
   <script type="module" src="js/admin.js"></script>
 </body>
