@@ -1,75 +1,237 @@
-import { database } from "./firebase.js";
-import { ref, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import { auth, database } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { ref, get, push, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-const playerNameEl = document.getElementById("player-name");
+const playerNameEl  = document.getElementById("player-name");
 const playerPointsEl = document.getElementById("player-points");
-const playerPfpEl = document.getElementById("player-pfp");
-const cardListEl = document.getElementById("card-list");
+const playerPfpEl   = document.getElementById("player-pfp");
+const cardListEl    = document.getElementById("card-list");
+const tradeSection  = document.getElementById("trade-section");
 
-// Get UID from URL
+const offerItemsEl  = document.getElementById("offer-items");
+const wantItemsEl   = document.getElementById("want-items");
+const addOfferBtn   = document.getElementById("add-offer-btn");
+const addWantBtn    = document.getElementById("add-want-btn");
+const sendTradeBtn  = document.getElementById("send-trade-btn");
+const tradeTargetName = document.getElementById("trade-target-name");
+const tradeIntroEl  = document.getElementById("trade-intro");
+
 const params = new URLSearchParams(window.location.search);
-const uid = params.get("id");
+const profileUid = params.get("id");
 
-if (!uid) {
-  playerNameEl.textContent = "Invalid profile link.";
-} else {
-  loadProfile(uid);
-}
+let currentUser   = null;
+let allCards      = {};
+let myCards       = {};     // viewer's cards
+let theirCards    = {};     // profile owner's cards
+let profileData   = null;
 
-async function loadProfile(uid) {
-  const userRef = ref(database, "users/" + uid);
-  const cardsRef = ref(database, "cards");
+// Rows the user has built up in the trade form
+// Each entry: { cardId, qty }
+let offerRows = [];
+let wantRows  = [];
 
-  try {
-    const [userSnap, cardsSnap] = await Promise.all([get(userRef), get(cardsRef)]);
-    const userData = userSnap.val();
-    const allCards = cardsSnap.val();
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = "index.html"; return; }
+  currentUser = user;
 
-    if (!userData) {
-      playerNameEl.textContent = "User not found.";
-      return;
-    }
+  if (!profileUid) { playerNameEl.textContent = "Invalid profile link."; return; }
 
-    // 🧍 Display username, points, and profile picture
-    playerNameEl.textContent = userData.username || "Unknown Player";
-    playerPointsEl.textContent = `$${userData.points || 0}`;
+  const [userSnap, profileSnap, cardsSnap] = await Promise.all([
+    get(ref(database, "users/" + user.uid)),
+    get(ref(database, "users/" + profileUid)),
+    get(ref(database, "cards")),
+  ]);
 
-    // ✅ Profile picture
-    const pfp = userData.profilePicture;
-    playerPfpEl.src =
-      pfp && (pfp.startsWith("http://") || pfp.startsWith("https://"))
-        ? pfp
-        : "images/default-pfp.png";
+  allCards    = cardsSnap.val() || {};
+  myCards     = userSnap.val()?.cards || {};
+  profileData = profileSnap.val();
 
-    // 🎴 Display cards (same style as dashboard)
-    const userCards = userData.cards || {};
-    renderCards(userCards, allCards);
-  } catch (err) {
-    console.error("Error loading profile:", err);
-    playerNameEl.textContent = "Error loading profile.";
+  if (!profileData) { playerNameEl.textContent = "User not found."; return; }
+
+  theirCards = profileData.cards || {};
+
+  // --- Render profile header ---
+  playerNameEl.textContent  = profileData.username || "Unknown Player";
+  playerPointsEl.textContent = `$${profileData.points || 0}`;
+  const pfp = profileData.profilePicture;
+  if (pfp && (pfp.startsWith("http://") || pfp.startsWith("https://"))) {
+    playerPfpEl.src = pfp;
   }
-}
 
-// ✅ This matches the dashboard style exactly
-function renderCards(userCards, allCards) {
+  // --- Render their card inventory ---
+  renderTheirCards();
+
+  // --- Show trade form only if viewing someone else's profile ---
+  if (profileUid !== currentUser.uid) {
+    tradeSection.style.display = "block";
+    tradeTargetName.textContent = profileData.username;
+    tradeIntroEl.textContent =
+      `You can offer cards from your inventory in exchange for cards from ${profileData.username}'s inventory. Both sides can include multiple cards with custom quantities.`;
+    addOfferRow();   // start with one blank row each side
+    addWantRow();
+  }
+});
+
+// --- Render their inventory ---
+function renderTheirCards() {
   cardListEl.innerHTML = "";
+  const entries = Object.entries(theirCards).filter(([, qty]) => parseInt(qty) > 0);
 
-  if (!userCards || Object.keys(userCards).length === 0) {
-    cardListEl.innerHTML = "<p>This player has no cards yet.</p>";
+  if (entries.length === 0) {
+    cardListEl.innerHTML = "<p style='text-align:center'>This player has no cards yet.</p>";
     return;
   }
 
-  for (const [id, quantity] of Object.entries(userCards)) {
-    const cardData = allCards[id];
-    if (!cardData) continue;
+  const wrap = document.createElement("div");
+  wrap.style.cssText = "display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin:15px;";
 
+  for (const [id, quantity] of entries) {
+    const card = allCards[id];
+    if (!card) continue;
     const div = document.createElement("div");
     div.classList.add("card-item");
     div.innerHTML = `
-      <h3>${cardData.name}</h3>
-      <img src="${cardData.image}" alt="${cardData.name}" class="card-image" />
-      <p>Quantity: ${quantity}</p>
+      <img src="${card.image}" alt="${card.name}" class="card-image" />
+      <h3>${card.name}</h3>
+      <p style="color:#aaa;font-size:0.8em">Tier ${card.tier}</p>
+      <p>Qty: <strong>${quantity}</strong></p>
+      <p class="card-value">$${parseInt(card.price) * parseInt(quantity)}</p>
     `;
-    cardListEl.appendChild(div);
+    wrap.appendChild(div);
   }
+  cardListEl.appendChild(wrap);
 }
+
+// --- Build a card selector row ---
+function makeCardRow(cardPool, defaultCardId, defaultQty, onRemove) {
+  const row = document.createElement("div");
+  row.classList.add("card-row");
+
+  // Card dropdown
+  const sel = document.createElement("select");
+  sel.innerHTML = `<option value="">-- choose card --</option>`;
+  for (const [cardId, qty] of Object.entries(cardPool)) {
+    const card = allCards[cardId];
+    if (!card || parseInt(qty) <= 0) continue;
+    const opt = document.createElement("option");
+    opt.value = cardId;
+    opt.textContent = `${card.name} (Tier ${card.tier}) — have ${qty}`;
+    if (cardId === defaultCardId) opt.selected = true;
+    sel.appendChild(opt);
+  }
+
+  // Qty input
+  const qtyInput = document.createElement("input");
+  qtyInput.type = "number";
+  qtyInput.min  = 1;
+  qtyInput.value = defaultQty || 1;
+  qtyInput.placeholder = "Qty";
+
+  // Remove button
+  const removeBtn = document.createElement("button");
+  removeBtn.textContent = "✕";
+  removeBtn.classList.add("remove-card-btn");
+  removeBtn.onclick = onRemove;
+
+  row.appendChild(sel);
+  row.appendChild(qtyInput);
+  row.appendChild(removeBtn);
+  return { row, sel, qtyInput };
+}
+
+// --- Offer rows (my cards) ---
+function addOfferRow() {
+  const entry = { cardId: "", qty: 1, row: null, sel: null, qtyInput: null };
+  const { row, sel, qtyInput } = makeCardRow(myCards, "", 1, () => {
+    offerRows = offerRows.filter(e => e !== entry);
+    row.remove();
+  });
+  entry.row = row; entry.sel = sel; entry.qtyInput = qtyInput;
+  offerRows.push(entry);
+  offerItemsEl.appendChild(row);
+}
+
+// --- Want rows (their cards) ---
+function addWantRow() {
+  const entry = { cardId: "", qty: 1, row: null, sel: null, qtyInput: null };
+  const { row, sel, qtyInput } = makeCardRow(theirCards, "", 1, () => {
+    wantRows = wantRows.filter(e => e !== entry);
+    row.remove();
+  });
+  entry.row = row; entry.sel = sel; entry.qtyInput = qtyInput;
+  wantRows.push(entry);
+  wantItemsEl.appendChild(row);
+}
+
+addOfferBtn.addEventListener("click", addOfferRow);
+addWantBtn.addEventListener("click",  addWantRow);
+
+// --- Send trade ---
+sendTradeBtn.addEventListener("click", async () => {
+  // Collect and validate offer side
+  const offerCards = [];
+  for (const entry of offerRows) {
+    const cardId = entry.sel.value;
+    const qty    = parseInt(entry.qtyInput.value);
+    if (!cardId) continue;
+    if (isNaN(qty) || qty < 1) return alert("Quantity must be at least 1.");
+    const maxOwned = parseInt(myCards[cardId] || 0);
+    if (qty > maxOwned) {
+      return alert(`You only own ${maxOwned}x ${allCards[cardId]?.name}.`);
+    }
+    offerCards.push({ cardId, qty });
+  }
+
+  // Collect and validate want side
+  const wantCards = [];
+  for (const entry of wantRows) {
+    const cardId = entry.sel.value;
+    const qty    = parseInt(entry.qtyInput.value);
+    if (!cardId) continue;
+    if (isNaN(qty) || qty < 1) return alert("Quantity must be at least 1.");
+    const maxOwned = parseInt(theirCards[cardId] || 0);
+    if (qty > maxOwned) {
+      return alert(`${profileData.username} only owns ${maxOwned}x ${allCards[cardId]?.name}.`);
+    }
+    wantCards.push({ cardId, qty });
+  }
+
+  if (offerCards.length === 0) return alert("Add at least one card to offer.");
+  if (wantCards.length === 0) return alert("Add at least one card to request.");
+
+  // Merge duplicate cardIds (if user picked same card in two rows)
+  const mergeCards = (arr) => {
+    const map = {};
+    for (const { cardId, qty } of arr) {
+      map[cardId] = (map[cardId] || 0) + qty;
+    }
+    return Object.entries(map).map(([cardId, qty]) => ({ cardId, qty }));
+  };
+
+  const merged = {
+    fromUid:    currentUser.uid,
+    toUid:      profileUid,
+    offerCards: mergeCards(offerCards),
+    wantCards:  mergeCards(wantCards),
+    status:     "pending",
+    createdAt:  Date.now(),
+  };
+
+  sendTradeBtn.disabled = true;
+  sendTradeBtn.textContent = "Sending...";
+
+  try {
+    await push(ref(database, "trades"), merged);
+    alert(`Trade offer sent to ${profileData.username}!`);
+
+    // Reset form
+    offerRows = []; wantRows = [];
+    offerItemsEl.innerHTML = ""; wantItemsEl.innerHTML = "";
+    addOfferRow(); addWantRow();
+  } catch (err) {
+    alert("Failed to send trade: " + err.message);
+  } finally {
+    sendTradeBtn.disabled = false;
+    sendTradeBtn.textContent = "Send Trade Offer";
+  }
+});

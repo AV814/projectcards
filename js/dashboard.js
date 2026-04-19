@@ -32,7 +32,13 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const userData = userSnap.val();
-  profilePic.src = userData.profilePicture || "";
+  // Set pic here only if it exists; the onValue listener will also keep it updated
+  if (userData.profilePicture) {
+    profilePic.src = userData.profilePicture;
+    profilePic.style.display = "";
+  } else {
+    profilePic.style.display = "none";
+  }
 
   const cardsRef = dbRef(database, "cards");
 
@@ -41,6 +47,11 @@ onAuthStateChanged(auth, async (user) => {
     const u = snap.val();
     if (!u) return;
     userInfo.innerHTML = `${u.username}<br><span class="points">$${u.points}</span>`;
+    // Always sync profile pic so it shows up after upload or on first load
+    if (u.profilePicture) {
+      profilePic.src = u.profilePicture;
+      profilePic.style.display = "";
+    }
     get(cardsRef).then(cs => {
       renderCards(u.cards || {}, cs.val() || {});
       renderStockHoldings(u.stocks || {});
