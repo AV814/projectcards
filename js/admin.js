@@ -10,7 +10,7 @@ const resetBtn = document.getElementById("force-sell");
 const statusEl = document.getElementById("status-msg");
 
 // How often prices auto-update (seconds)
-const INTERVAL_SECONDS = 3600;
+const INTERVAL_SECONDS = 600;
 let countdown = INTERVAL_SECONDS;
 let updateRunning = false;
 
