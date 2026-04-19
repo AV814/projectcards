@@ -100,7 +100,7 @@ function renderStockHoldings(userStocks) {
 
   get(dbRef(database, "stocks")).then(snap => {
     const allStocks = snap.val() || {};
-    let html = "";
+    let html = `<div class="holdings-table">`;
     let total = 0;
     for (const [id, qty] of entries) {
       const stock = allStocks[id];
@@ -108,11 +108,15 @@ function renderStockHoldings(userStocks) {
       const val = parseInt(stock.price) * parseInt(qty);
       total += val;
       html += `<div class="stock-holding-row">
-        <span>${stock.ticker || id} — ${stock.name}</span>
-        <span>${qty} shares @ $${stock.price} = <strong>$${val}</strong></span>
+        <span class="holding-ticker">${stock.ticker || id}</span>
+        <span class="holding-name">${stock.name}</span>
+        <span class="holding-qty">${qty} shares</span>
+        <span class="holding-price">@ $${stock.price}</span>
+        <span class="holding-val"><strong>$${val}</strong></span>
       </div>`;
     }
-    el.innerHTML = html + `<p class="card-value">Stocks value: $${total}</p>`;
+    html += `<div class="holdings-total">Total: <strong>$${total}</strong></div></div>`;
+    el.innerHTML = html;
   });
 }
 

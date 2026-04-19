@@ -49,6 +49,7 @@ onAuthStateChanged(auth, async (user) => {
   if (!profileData) { playerNameEl.textContent = "User not found."; return; }
 
   theirCards = profileData.cards || {};
+  const theirStocks = profileData.stocks || {};
 
   // --- Render profile header ---
   playerNameEl.textContent  = profileData.username || "Unknown Player";
@@ -60,6 +61,9 @@ onAuthStateChanged(auth, async (user) => {
 
   // --- Render their card inventory ---
   renderTheirCards();
+
+  // --- Render their stock holdings ---
+  renderTheirStocks(theirStocks);
 
   // --- Show trade form only if viewing someone else's profile ---
   if (profileUid !== currentUser.uid) {
@@ -104,6 +108,34 @@ function renderTheirCards() {
     wrap.appendChild(div);
   }
   cardListEl.appendChild(wrap);
+}
+
+// --- Render their stock holdings ---
+async function renderTheirStocks(userStocks) {
+  const el = document.getElementById("their-stock-holdings");
+  if (!el) return;
+  const entries = Object.entries(userStocks).filter(([, qty]) => parseInt(qty) > 0);
+  if (entries.length === 0) { el.innerHTML = "<p>No stocks held.</p>"; return; }
+
+  const stocksSnap = await get(ref(database, "stocks"));
+  const allStocks  = stocksSnap.val() || {};
+  let html = `<div class="holdings-table">`;
+  let total = 0;
+  for (const [id, qty] of entries) {
+    const stock = allStocks[id];
+    if (!stock) continue;
+    const val = parseInt(stock.price) * parseInt(qty);
+    total += val;
+    html += `<div class="stock-holding-row">
+      <span class="holding-ticker">${stock.ticker || id}</span>
+      <span class="holding-name">${stock.name}</span>
+      <span class="holding-qty">${qty} shares</span>
+      <span class="holding-price">@ $${stock.price}</span>
+      <span class="holding-val"><strong>$${val}</strong></span>
+    </div>`;
+  }
+  html += `<div class="holdings-total">Total: <strong>$${total}</strong></div></div>`;
+  el.innerHTML = html;
 }
 
 // --- Build a card selector row ---
