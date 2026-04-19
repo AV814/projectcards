@@ -118,8 +118,8 @@ a.button:hover { background-color: #476DC9; }
 .card-item {
   background: #2c2f36;
   color: white;
-  padding: 15px;
-  border-radius: 8px;
+  padding: 8px;
+  border-radius: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   width: 200px;
   text-align: center;
