@@ -54,7 +54,7 @@ function renderStore(cards, uid) {
     const indicatorClass = data.lastChange === "up" ? "up" : data.lastChange === "down" ? "down" : "";
     const ownedCount = currentUserCards[id] || 0;
     const price = parseInt(data.price);
-    const sellPrice = Math.floor(price * 0.9);
+    const sellPrice = price;
     const outOfStock = parseInt(data.stock) <= 0;
     const cantAfford = currentPoints < price;
 
@@ -62,7 +62,7 @@ function renderStore(cards, uid) {
       <h3>${data.name}</h3>
       <img src="${data.image}" alt="${data.name}" class="card-image" />
       <p class="${indicatorClass}">Price: $${price} ${indicator}</p>
-      <p class="sell-price-hint">Sell back: $${sellPrice}</p>
+      <p class="sell-price-hint">Sell back: $${price}</p>
       <p>Stock: ${outOfStock ? "<span style='color:#d63031'>Sold out</span>" : data.stock}</p>
       <p>You own: <strong>${ownedCount}</strong></p>
       <button class="buy-btn" data-id="${id}" ${outOfStock || cantAfford ? "disabled" : ""}>
@@ -153,7 +153,7 @@ async function sellCard(uid, cardId) {
       }
 
       // Cards stored by name — sell using name key
-      const sellPrice = Math.floor(parseInt(cardData.price) * 0.9);
+      const sellPrice = parseInt(cardData.price);
       await runTransaction(userRef, (user) => {
         if (!user) return user;
         if (!user.cards || !user.cards[cardName]) return;
@@ -171,7 +171,7 @@ async function sellCard(uid, cardId) {
       return;
     }
 
-    const sellPrice = Math.floor(parseInt(cardData.price) * 0.9);
+    const sellPrice = parseInt(cardData.price);
 
     await runTransaction(userRef, (user) => {
       if (!user) return user;

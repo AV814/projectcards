@@ -115,11 +115,24 @@ uploadPfpInput.addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file || !currentUser) return;
 
-  const filePath = `profile_pictures/${currentUser.uid}.jpg`;
+  // Validate file type
+  if (!file.type.startsWith("image/")) {
+    alert("Please select an image file.");
+    return;
+  }
+
+  // Keep the real extension (jpg, png, gif, webp etc.)
+  const ext = file.name.split(".").pop().toLowerCase();
+  const filePath = `profile_pictures/${currentUser.uid}.${ext}`;
   const fileRef = storageRef(storage, filePath);
 
+  changePfpBtn.disabled = true;
+  changePfpBtn.textContent = "Uploading...";
+
   try {
-    await uploadBytes(fileRef, file);
+    // Upload with correct content type
+    const metadata = { contentType: file.type };
+    await uploadBytes(fileRef, file, metadata);
     const downloadURL = await getDownloadURL(fileRef);
 
     await update(dbRef(database, "users/" + currentUser.uid), {
@@ -129,8 +142,15 @@ uploadPfpInput.addEventListener("change", async (e) => {
     profilePic.src = downloadURL;
     alert("Profile picture updated!");
   } catch (err) {
-    console.error("Error uploading profile picture:", err);
-    alert("Failed to upload profile picture. Please try again.");
+    console.error("PFP upload error:", err.code, err.message);
+    if (err.code === "storage/unauthorized") {
+      alert("Upload blocked by Firebase Storage rules.\n\nGo to Firebase Console → Storage → Rules and allow authenticated writes to profile_pictures/.");
+    } else {
+      alert("Upload failed: " + err.message);
+    }
+  } finally {
+    changePfpBtn.disabled = false;
+    changePfpBtn.textContent = "PFP Upload";
   }
 });
 
