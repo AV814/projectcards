@@ -129,29 +129,60 @@ async function sellCard(uid, cardId) {
   const cardRef = ref(database, "cards/" + cardId);
 
   try {
-    // Read current state first
     const [userSnap, cardSnap] = await Promise.all([get(userRef), get(cardRef)]);
     const userData = userSnap.val();
     const cardData = cardSnap.val();
 
     if (!cardData) return alert("Card not found.");
-    if (!userData.cards || !userData.cards[cardId] || userData.cards[cardId] <= 0) {
-      return alert("You don't own that card!");
+
+    // Log exactly what we see so we can debug key mismatches
+    console.log("Sell attempt — cardId:", cardId);
+    console.log("User cards in DB:", userData.cards);
+
+    const ownedQty = parseInt(userData.cards?.[cardId] || 0);
+    console.log("Owned qty for this cardId:", ownedQty);
+
+    if (ownedQty <= 0) {
+      // Also check if cards are stored by name instead of ID (old data)
+      const cardName = cardData.name;
+      const ownedByName = parseInt(userData.cards?.[cardName] || 0);
+      console.log("Owned qty by card name fallback:", ownedByName);
+
+      if (ownedByName <= 0) {
+        return alert("You don\'t own that card!\n\nDebug: cardId=" + cardId + "\nYour cards: " + JSON.stringify(userData.cards));
+      }
+
+      // Cards stored by name — sell using name key
+      const sellPrice = Math.floor(parseInt(cardData.price) * 0.9);
+      await runTransaction(userRef, (user) => {
+        if (!user) return user;
+        if (!user.cards || !user.cards[cardName]) return;
+        user.points += sellPrice;
+        user.cards[cardName] -= 1;
+        if (user.cards[cardName] <= 0) delete user.cards[cardName];
+        return user;
+      });
+      await runTransaction(cardRef, (card) => {
+        if (!card) return card;
+        card.stock += 1;
+        return card;
+      });
+      await push(ref(database, "transactions"), { cardId, action: "sell" });
+      return;
     }
 
     const sellPrice = Math.floor(parseInt(cardData.price) * 0.9);
 
-    // Add sell value and remove card from user — single atomic transaction
     await runTransaction(userRef, (user) => {
       if (!user) return user;
-      if (!user.cards || !user.cards[cardId]) return; // abort
+      const qty = parseInt(user.cards?.[cardId] || 0);
+      if (qty <= 0) return;
       user.points += sellPrice;
-      user.cards[cardId] -= 1;
+      user.cards[cardId] = qty - 1;
       if (user.cards[cardId] <= 0) delete user.cards[cardId];
       return user;
     });
 
-    // Return stock
     await runTransaction(cardRef, (card) => {
       if (!card) return card;
       card.stock += 1;
