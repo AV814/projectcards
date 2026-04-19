@@ -120,11 +120,15 @@ function showResults(box, pulled) {
   for (const { cardData, count } of Object.values(counts)) {
     const div = document.createElement("div");
     div.classList.add("result-card");
+    const chance   = parseFloat(cardData.sellChance    || 0.5) * 100;
+    const mult     = parseFloat(cardData.sellMultiplier || 1.5);
+    const upPrice  = Math.round(parseInt(cardData.price) * mult);
     div.innerHTML = `
       <img src="${cardData.image}" alt="${cardData.name}" class="card-image" />
       <p><strong>${cardData.name}</strong></p>
       <p style="color:#aaa;font-size:0.8em">Tier ${cardData.tier}</p>
       ${count > 1 ? `<p style="color:#fdcb6e">x${count}</p>` : ""}
+      <p class="sell-chance-tag">🎲 ${chance.toFixed(0)}% → $${upPrice}</p>
     `;
     resultCards.appendChild(div);
   }

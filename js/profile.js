@@ -90,12 +90,16 @@ function renderTheirCards() {
     if (!card) continue;
     const div = document.createElement("div");
     div.classList.add("card-item");
+    const chance  = parseFloat(card.sellChance    || 0.5) * 100;
+    const mult    = parseFloat(card.sellMultiplier || 1.5);
+    const upPrice = Math.round(parseInt(card.price) * mult);
     div.innerHTML = `
       <img src="${card.image}" alt="${card.name}" class="card-image" />
       <h3>${card.name}</h3>
       <p style="color:#aaa;font-size:0.8em">Tier ${card.tier}</p>
       <p>Qty: <strong>${quantity}</strong></p>
       <p class="card-value">$${parseInt(card.price) * parseInt(quantity)}</p>
+      <p class="sell-chance-tag">🎲 ${chance.toFixed(0)}% → $${upPrice}</p>
     `;
     wrap.appendChild(div);
   }

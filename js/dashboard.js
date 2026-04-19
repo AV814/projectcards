@@ -75,12 +75,16 @@ function renderCards(userCards, allCards) {
     total += val;
     const div = document.createElement("div");
     div.classList.add("card-item");
+    const chance = parseFloat(card.sellChance || 0.5) * 100;
+    const mult   = parseFloat(card.sellMultiplier || 1.5);
+    const upPrice = Math.round(parseInt(card.price) * mult);
     div.innerHTML = `
       <img src="${card.image}" alt="${card.name}" class="card-image" />
       <h3>${card.name}</h3>
       <p style="color:#aaa;font-size:0.8em">Tier ${card.tier}</p>
       <p>Qty: <strong>${qty}</strong></p>
       <p class="card-value">$${val}</p>
+      <p class="sell-chance-tag">🎲 ${chance.toFixed(0)}% → $${upPrice}</p>
     `;
     cardContainer.appendChild(div);
   }
@@ -118,13 +122,22 @@ function renderWeeklyReport(report) {
     weeklyReportEl.innerHTML = "<p>No weekly report yet.</p>";
     return;
   }
-  let rows = report.lines.map(l =>
-    `<tr><td>${l.name}</td><td>${l.qty}</td><td>$${l.priceEach}</td><td>$${l.total}</td></tr>`
-  ).join("");
+  let rows = report.lines.map(l => {
+    const outcomeEmoji = l.outcome === "up" ? "🔺" : "🔻";
+    const outcomeColor = l.outcome === "up" ? "#00b894" : "#d63031";
+    const vs = l.basePrice !== l.finalPrice
+      ? `<small style="color:#888"> (base $${l.basePrice})</small>` : "";
+    return `<tr>
+      <td>${l.name}</td>
+      <td>${l.qty}</td>
+      <td style="color:${outcomeColor}">${outcomeEmoji} $${l.finalPrice}${vs}</td>
+      <td><strong>$${l.total}</strong></td>
+    </tr>`;
+  }).join("");
   weeklyReportEl.innerHTML = `
     <p>Week of <strong>${report.week}</strong> — Total earned: <strong style="color:#00b894">$${report.earnings}</strong></p>
     <table class="report-table">
-      <thead><tr><th>Card</th><th>Qty</th><th>Price Each</th><th>Total</th></tr></thead>
+      <thead><tr><th>Card</th><th>Qty</th><th>Sold At</th><th>Total</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   `;
