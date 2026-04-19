@@ -62,7 +62,6 @@ function renderStore(cards, uid) {
       <h3>${data.name}</h3>
       <img src="${data.image}" alt="${data.name}" class="card-image" />
       <p class="${indicatorClass}">Price: $${price} ${indicator}</p>
-      <p class="sell-price-hint">Sell back: $${price}</p>
       <p>Stock: ${outOfStock ? "<span style='color:#d63031'>Sold out</span>" : data.stock}</p>
       <p>You own: <strong>${ownedCount}</strong></p>
       <button class="buy-btn" data-id="${id}" ${outOfStock || cantAfford ? "disabled" : ""}>
